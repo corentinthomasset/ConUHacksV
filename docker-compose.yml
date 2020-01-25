@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  server:
+    image: server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/usr/src/
+      - /usr/src/node_modules
+    ports:
+      - "80:80"
