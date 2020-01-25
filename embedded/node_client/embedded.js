@@ -18,13 +18,20 @@ socket.on('connect', () => {
     dbg("Identification sent.");
 });
 
-socket.on('open_box', (data) => {
-    dbg('Open Sesame!' , data);
+socket.on('open', () => {
+    dbg('Open Sesame!');
 
-    var ps = new PythonShell('test.py');
+    let options = {
+        mode: 'text',
+        pythonOptions: ['-u'], // get print results in real-time
+        args: ['test']
+    };
+
+    var ps = new PythonShell('test.py', options);
     ps.on('message', function (message) {
         dbg("Output from script:", message);
     });
+    
     ps.end(function (err) {
         if (err){
             throw err;
