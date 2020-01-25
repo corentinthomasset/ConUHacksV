@@ -12,7 +12,7 @@ try {
     process.exit()
 }
 
-const socket = io('http://18.188.99.138/mailbox');
+const socket = io('http://18.188.99.138:8080/');
 const dbg = debug('embedded');
 
 dbg("----");
