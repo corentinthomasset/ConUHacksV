@@ -4,7 +4,13 @@
 import {PythonShell} from 'python-shell';
 import io from 'socket.io-client';
 import debug from 'debug';
-import keys from './2keys.js';
+try {
+    import keys from './2keys.js';
+} catch (e) {
+    console.error("Need to generate key pair!")
+    console.error("node keygen.js")
+    process.exit()
+}
 
 const socket = io('http://18.188.99.138/mailbox');
 const dbg = debug('embedded');
@@ -22,7 +28,6 @@ socket.on('open', () => {
     dbg('Open Sesame!');
 
     let options = {
-        mode: 'text',
         pythonOptions: ['-u'], // get print results in real-time
         args: ['test']
     };
@@ -31,7 +36,7 @@ socket.on('open', () => {
     ps.on('message', function (message) {
         dbg("Output from script:", message);
     });
-    
+
     ps.end(function (err) {
         if (err){
             throw err;
