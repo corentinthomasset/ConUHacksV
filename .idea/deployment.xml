@@ -5,10 +5,10 @@
       <paths name="AWS">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/" local="$PROJECT_DIR$/server" web="/" />
           </mappings>
           <excludedPaths>
-            <excludedPath local="true" path="$PROJECT_DIR$/server/node_modules" />
+            <excludedPath local="true" path="$PROJECT_DIR$/server/Mailbox/node_modules" />
           </excludedPaths>
         </serverdata>
       </paths>

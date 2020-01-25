@@ -5,22 +5,18 @@ import Mailbox from "./Mailbox";
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const dbg = Debug('server');
+const dbg = Debug('mailbox');
 
 app.get('/', (req, res)=>{
     res.send('Server running');
 });
 
-io.of('/mailbox').on('connection', (socket)=>{
-    socket.on('box_id', (id)=>{
-       Mailbox.newBox(id, socket);
+io.on('connection', (socket)=>{
+    socket.on('box_id', (publicKey, privateKey)=>{
+       Mailbox.newBox(publicKey, privateKey, socket);
     });
 });
 
-io.of('/ui').on('connection', (socket)=>{
-    console.log('ui connected');
-});
-
-http.listen(80, ()=>{
-    dbg(`Listening on *:80`);
+http.listen(8080, ()=>{
+    dbg(`Listening on *:8080`);
 });
