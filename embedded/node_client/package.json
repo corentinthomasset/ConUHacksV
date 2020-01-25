@@ -1,0 +1,27 @@
+{
+  "name": "embedded",
+  "version": "1.0.0",
+  "description": "",
+  "main": "embedded.js",
+  "scripts": {
+    "build": "babel src -d dist",
+    "serve": "DEBUG=embedded* nodemon --exec babel-node embedded.js",
+    "keygen": "nodemon --exec babel-node keygen.js"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.6.4",
+    "asymmetric-crypto": "^1.0.2",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.3",
+    "python-shell": "^1.0.8",
+    "socket.io-client": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/node": "^7.6.3",
+    "@babel/preset-env": "^7.6.3"
+  },
+  "author": "Corentin Thomasset",
+  "license": "ISC"
+}
