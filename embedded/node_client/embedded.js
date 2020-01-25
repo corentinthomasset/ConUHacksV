@@ -4,13 +4,7 @@
 import {PythonShell} from 'python-shell';
 import io from 'socket.io-client';
 import debug from 'debug';
-try {
-    import keys from './2keys.js';
-} catch (e) {
-    console.error("Need to generate key pair!")
-    console.error("node keygen.js")
-    process.exit()
-}
+import keys from './2keys.js';
 
 const socket = io('http://18.188.99.138:8080/');
 const dbg = debug('embedded');
