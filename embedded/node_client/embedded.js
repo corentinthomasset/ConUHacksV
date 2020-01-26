@@ -38,9 +38,9 @@ socket.on('open', () => {
     });
 });
 
-socket.on('get_OTT', (msg) => {
+socket.on('getOTT', (msg) => {
     dbg('Generating One Time Token!');
     dbg('OTP Msg: ', msg);
     const sig = crypto.sign(msg, keys.secretKey);
-    socket.emit('OPT', msg, sig);
+    socket.emit('OTT', msg, sig);
 });
