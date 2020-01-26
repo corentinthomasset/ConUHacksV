@@ -12,8 +12,8 @@ app.get('/', (req, res)=>{
 });
 
 io.on('connection', (socket)=>{
-    socket.on('box_id', (publicKey, privateKey)=>{
-       Mailbox.newBox(publicKey, privateKey, socket);
+    socket.on('box_id', (publicKey)=>{
+       Mailbox.newBox(publicKey, socket);
     });
 });
 

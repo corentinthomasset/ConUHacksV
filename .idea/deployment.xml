@@ -9,6 +9,7 @@
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/server/Mailbox/node_modules" />
+            <excludedPath local="true" path="$PROJECT_DIR$/server/Webapp/node_modules" />
           </excludedPaths>
         </serverdata>
       </paths>
