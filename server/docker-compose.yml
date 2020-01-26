@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  mailbox_service:
+    image: mailbox
+    build:
+      context: ./Mailbox/
+    volumes:
+      - ./Mailbox:/usr/src/Mailbox/
+      - /usr/src/Mailbox/node_modules
+    ports:
+      - "8080:8080"
+    networks:
+      - extnet
+      - inet
+
+  webapp_service:
+    image: webapp
+    build:
+      context: ./Webapp/
+    volumes:
+      - ./Webapp:/usr/src/Webapp/
+      - /usr/src/Webapp/node_modules
+    ports:
+      - "80:80"
+    networks:
+      - extnet
+      - inet
+
+  spycam_service:
+    image: spycam
+    build:
+      context: ./Spycam/
+    volumes:
+      - ./Spycam:/usr/src/Spycam/
+      - /usr/src/Spycam/node_modules
+      - /usr/src/Spycam/users
+    ports:
+      - "9999:9999"
+    networks:
+      - extnet
+      - inet
+
+  auth_service:
+    image: auth
+    build:
+      context: ./Auth/
+    volumes:
+      - ./Auth:/usr/src/Auth/
+      - /usr/src/Auth/node_modules
+    networks:
+      - inet
+
+networks:
+  extnet:
+  inet:
+    internal: true
+
