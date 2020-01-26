@@ -81,7 +81,7 @@ export default {
       }
     },
     alerts(){
-      return Alert.query().with('box').all();
+      return Alert.query().with('box').orderBy('date', 'desc').get();
     },
     delivery(){
       return User.query().with('boxes').all()[0].deliveryService;
