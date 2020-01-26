@@ -8,9 +8,10 @@ import crypto from 'asymmetric-crypto';
 import fs from 'fs';
 import keys from './2keys.js';
 import im from 'imagemagick';
+import request from 'request';
 
 const socket = io('http://18.188.99.138:8080/');
-
+const spycamIp = 'https://18.188.99.138:9999/';
 const dbg = debug('embedded');
 const dbgOpen = debug('embedded:open');
 
@@ -86,6 +87,17 @@ socket.on('VALIDATE_DELIVERY', () => {
             }
     );
     dbgOpen("Gif Generated.");
+    
+    request.post({url:'http://172.30.191.200:9999/upload/'+encodeURIComponent(keys.publicKey), formData: formData}, (err, res, body) => {
+    	if (err) {
+        	dbgOpen("Error on upload", err);
+    	} else {
+	    	dbgOpen('Gif uploaded');
+	}
+    });
+
+
+
 
     // POST GIF
 

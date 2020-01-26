@@ -18,6 +18,7 @@
     "nodemon": "^1.19.3",
     "png-file-stream": "^1.2.1",
     "python-shell": "^1.0.8",
+    "request": "^2.88.0",
     "sleep": "^6.1.0",
     "socket.io-client": "^2.3.0"
   },
