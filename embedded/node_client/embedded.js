@@ -1,6 +1,6 @@
 // app.js
 // https://ourcodeworld.com/articles/read/286/how-to-execute-a-python-script-and-retrieve-output-data-and-errors-in-node-js
-
+import sleep from 'sleep';
 import {PythonShell} from 'python-shell';
 import io from 'socket.io-client';
 import debug from 'debug';
@@ -10,15 +10,17 @@ import keys from './2keys.js';
 import im from 'imagemagick';
 
 const socket = io('http://18.188.99.138:8080/');
+
 const dbg = debug('embedded');
+const dbgOpen = debug('embedded:open');
+
 let takePicsTask;
 let picsTaken = 0;
 const takePic = () => {
     let cameraOptions = {
         args: [picsTaken+1]
     };
-    // Generate pic    
-    dbg("Taking picture ", picsTaken+1, ".");
+    dbgOpen("Taking picture", picsTaken+1, ".");
     var cameraShell = new PythonShell('../hw_control/camera.py', cameraOptions);
     cameraShell.end(function (err) {
         picsTaken = picsTaken + 1;
@@ -54,22 +56,23 @@ socket.on('open', () => {
             throw err;
         };
     });
+    // clean
+    fs.readdirSync('.').filter(fn => fn.endsWith('.jpg')).forEach(i => fs.unlinkSync(i));
     
     takePic();
     takePicsTask = setInterval(takePic, 5000);
-    
     // Test Code
     let stop = setTimeout(() => {
         clearInterval(takePicsTask);
-        dbg(picsTaken, "pictures taken.");
-        im.convert(['-delay', '50', '-loop', '0', '*.jpg', 'res.gif'], 
+	sleep.sleep(3); // Because sometimes a picture cant be written to disk fast enough before the convert happens? MAYBE
+        dbgOpen(picsTaken, "pictures taken.");
+        im.convert(['-delay', '80', '-loop', '0', '*.jpg', 'res.gif'], 
                 function(err, stdout){
-                    if (err) {dbg(err);process.exit()}
+                    if (err) {dbg(err);process.exit();}
                 }
         );
-        dbg("Gif Generated. Clearing Frames");
-        fs.readdirSync('.').filter(fn => fn.endsWith('.jpg')).forEach(i => i.unlinkSync());
-    }, 20000);
+        dbgOpen("Gif Generated. Clearing Frames");
+    }, 23000);
 });
 
 socket.on('getOTT', (msg) => {
