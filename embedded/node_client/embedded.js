@@ -11,6 +11,20 @@ const socket = io('http://18.188.99.138:8080/');
 const dbg = debug('embedded');
 let takePicsTask;
 let picsTaken = 0;
+let takePic = () => {
+    let cameraOptions = {
+        args: [picsTaken+1]
+    };
+    // Generate pic    
+    dbg("Taking picture ", picsTaken+1, ".");
+    var cameraShell = new PythonShell('../hw_control/camera.py', cameraOptions);
+    cameraShell.end(function (err) {
+        picsTaken = picsTaken + 1;
+        if (err) {
+            throw err;
+        };
+    });
+};
 
 dbg("----");
 
@@ -39,20 +53,15 @@ socket.on('open', () => {
         };
     });
     
-    takePicsTask = setInterval(() => {
-        let cameraOptions = {
-            args: [picsTaken+1]
-        };
-        // Generate pic    
-        dbg("Taking picture ", picsTaken+1, ".");
-        var cameraShell = new PythonShell('../hw_control/camera.py', cameraOptions);
-        cameraShell.end(function (err) {
-            picsTaken = picsTaken + 1;
-            if (err) {
-                throw err;
-            };
-        });
-    }, 10000)
+    takePic();
+    takePicsTask = setInterval(takePic, 10000);
+    
+    // Test Code
+    dbg("Stopping in 44 seconds");
+    let stop = setTimeout(() => {
+        clearInterval(takePicsTask);
+        dbg(picsTaken, "pictures taken.")
+    }, 44000);
 });
 
 socket.on('getOTT', (msg) => {
