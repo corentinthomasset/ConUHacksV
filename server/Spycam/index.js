@@ -12,12 +12,18 @@ let storage = multer.diskStorage({
     filename: function (req, file, cb) {
       cb(null, Date.now() + '.gif');
     }
-})
+});
 
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const dbg = Debug('spycam');
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 app.post('/upload/:pk', multer({ storage: storage }).single('spycam'), (req, res)=>{
     let sc = Spycam.getSpycam(req.params.pk);

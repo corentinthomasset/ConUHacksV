@@ -1,10 +1,11 @@
 import Debug from 'debug';
 
 class Mailbox{
-    constructor(publicKey, socket) {
+    constructor(publicKey, userId, socket) {
         this._publicKey = publicKey;
         this._socket = socket;
         this._dbg = Debug(`mailbox:${publicKey}`);
+        this._userId = userId;
 
         this._dbg('Connected');
 
@@ -12,27 +13,16 @@ class Mailbox{
             this._dbg('Disconnected');
             delete mailboxes[this._publicKey];
         });
-
-        setTimeout(()=>{
-            this.open();
-            this.getToken('test').then(OTT=>{
-                console.log(OTT);
-            });
-        }, 5000);
-
-        setTimeout(()=>{
-            this.validateDelivery();
-        }, 37000);
     }
 
-    open(){
-        this._socket.emit('open');
-        this._dbg(`Opening box`);
+    unlock(){
+        this._socket.emit('unlock');
+        this._dbg(`Unlocking box`);
     }
 
-    validateDelivery(){
-        this._socket.emit('validateDelivery');
-        this._dbg(`Validating Delivery`);
+    lock(){
+        this._socket.emit('lock');
+        this._dbg(`Locking box`);
     }
 
     singleBuzz(){
@@ -62,8 +52,8 @@ class Mailbox{
 
 let mailboxes = {};
 
-function newBox(publicKey, socket){
-    mailboxes[publicKey] = new Mailbox(publicKey, socket);
+function newBox(publicKey, userId, socket){
+    mailboxes[publicKey] = new Mailbox(publicKey, userId, socket);
 }
 
 function getBox(publicKey){
@@ -71,6 +61,6 @@ function getBox(publicKey){
 }
 
 export default {
-    newBox: (publicKey, socket)=>{newBox(publicKey, socket)},
+    newBox: (publicKey, userId, socket)=>{newBox(publicKey, userId, socket)},
     getBox: (publicKey)=>{return getBox(publicKey)}
 }

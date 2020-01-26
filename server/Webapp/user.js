@@ -38,10 +38,15 @@ function registerSocket(email, socket){
     usersSocket[email] = socket;
 }
 
+function getSocket(email){
+    return usersSocket[email];
+}
+
 
 export default {
     login: (email, password)=>{return login(email, password)},
     registerToken: (id, token)=>{registerToken(id, token)},
     jwtLogin: (id, token)=>{return jwtLogin(id, token)},
-    registerSocket: (email, socket)=>{registerSocket(email, socket)}
+    registerSocket: (email, socket)=>{registerSocket(email, socket)},
+    getSocket: (email)=>{return getSocket(email)}
 }

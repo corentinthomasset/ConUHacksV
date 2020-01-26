@@ -27,6 +27,20 @@ services:
       - extnet
       - inet
 
+  spycam_service:
+    image: spycam
+    build:
+      context: ./Spycam/
+    volumes:
+      - ./Spycam:/usr/src/Spycam/
+      - /usr/src/Spycam/node_modules
+      - /usr/src/Spycam/users
+    ports:
+      - "9999:9999"
+    networks:
+      - extnet
+      - inet
+
   auth_service:
     image: auth
     build:

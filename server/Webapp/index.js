@@ -3,6 +3,8 @@ import Debug from 'debug';
 import Auth from './auth';
 import User from './user';
 import Token from './token';
+import axios from 'axios';
+import settings from "./settings";
 
 const express = require('express');
 const app = express();
@@ -41,6 +43,20 @@ const io = require('socket.io')(http);
 io.sockets.on('connection', Token.authorizeSocket()).on('authenticated', (socket)=> {
     let userEmail = socket.decoded_token.user;
     User.registerSocket(userEmail, socket);
+    socket.on('lock', boxId=>{
+        axios.post(`${settings.mailbox_service.api}/box`, {boxId: boxId, action: 'lock'});
+
+        if(boxId === '61ajWQE5hMpZvzA/r6+LR6LI5ykEMQ06ixwz+IrCue8='){
+           let s = User.getSocket('corentin@me.io');
+           if(s === socket){
+               s.emit('lock', boxId);
+           }
+        }
+    });
+
+    socket.on('unlock', boxId=>{
+        axios.post(`${settings.mailbox_service.api}/box`, {boxId: boxId, action: 'unlock'});
+    });
 });
 
 http.listen(80, ()=>{
