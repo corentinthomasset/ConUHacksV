@@ -85,6 +85,7 @@ function tokenLogIn(email, token){
 }
 
 newUser('corentin@me.io', 'janvier', 'Corentin', 'Thomasset');
+newPostMan('mark@post.ca', 'fevrier', 'Mark', 'Zuchini', 'Post Canada');
 registerMailbox('corentin@me.io', '61ajWQE5hMpZvzA/r6+LR6LI5ykEMQ06ixwz+IrCue8=', '1450 Rue Guy, Montréal, QC H3H 0A1');
 
 export default {

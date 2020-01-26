@@ -5,6 +5,7 @@ import User from './user';
 import Token from './token';
 import axios from 'axios';
 import settings from "./settings";
+import path from 'path';
 
 const express = require('express');
 const app = express();
@@ -32,30 +33,36 @@ app.post('/login', async (req, res) => {
 
 app.get('/', Auth, async(req, res) => {
     // View logged in user profile
-    res.send('Logged in')
+    res.sendFile(path.join(__dirname + '/static/index.html'));
 });
-
+/*
 app.all('*', (req, res) => {
     res.redirect("/");
-});
+});*/
+
+app.use('/static', express.static('static'));
 
 const io = require('socket.io')(http);
 io.sockets.on('connection', Token.authorizeSocket()).on('authenticated', (socket)=> {
     let userEmail = socket.decoded_token.user;
     User.registerSocket(userEmail, socket);
     socket.on('lock', boxId=>{
-        axios.post(`${settings.mailbox_service.api}/box`, {boxId: boxId, action: 'lock'});
+        axios.post(`${settings.mailbox_service.api}/box`, {boxId: boxId, action: 'lock'}).catch(error=>{
+            dbg(`Box ${boxId} unreachable`);
+        });
 
         if(boxId === '61ajWQE5hMpZvzA/r6+LR6LI5ykEMQ06ixwz+IrCue8='){
            let s = User.getSocket('corentin@me.io');
-           if(s === socket){
+           if(s !== socket){
                s.emit('lock', boxId);
            }
         }
     });
 
     socket.on('unlock', boxId=>{
-        axios.post(`${settings.mailbox_service.api}/box`, {boxId: boxId, action: 'unlock'});
+        axios.post(`${settings.mailbox_service.api}/box`, {boxId: boxId, action: 'unlock'}).catch(error=>{
+            dbg(`Box ${boxId} unreachable`);
+        });
     });
 });
 

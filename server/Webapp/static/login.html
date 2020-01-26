@@ -102,14 +102,15 @@
                 localStorage.user = JSON.stringify(data.user);
                 window.location.href = '/?token=' + localStorage.token;
             } else {
+                localStorage.token = '';
                 document.querySelector('p').setAttribute('show', 'true');
             }
         }
     }
 
-    if(localStorage.token){
+    /*if(localStorage.token){
         window.location.href = '/?token=' + localStorage.token;
-    }
+    }*/
 </script>
 </body>
 </html>
