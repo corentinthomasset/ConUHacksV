@@ -20,7 +20,7 @@ const takePic = () => {
     let cameraOptions = {
         args: [picsTaken+1]
     };
-    dbgOpen("Taking picture", picsTaken+1, ".");
+    dbgOpen("Taking picture", picsTaken+1, " in 3 seconds.");
     var cameraShell = new PythonShell('../hw_control/camera.py', cameraOptions);
     cameraShell.end(function (err) {
         picsTaken = picsTaken + 1;
@@ -40,6 +40,10 @@ socket.on('connect', () => {
 });
 
 socket.on('open', () => {
+    if (takePicsTask !== null) {
+        dbgOpen("Open event while already in Open sequence ??")
+        return;
+    }
     dbg('Open Sesame!');
 
     let options = {
@@ -56,23 +60,12 @@ socket.on('open', () => {
             throw err;
         };
     });
-    // clean
+
+    // Clean images before starting a new process.
     fs.readdirSync('.').filter(fn => fn.endsWith('.jpg')).forEach(i => fs.unlinkSync(i));
     
     takePic();
     takePicsTask = setInterval(takePic, 5000);
-    // Test Code
-    let stop = setTimeout(() => {
-        clearInterval(takePicsTask);
-	sleep.sleep(3); // Because sometimes a picture cant be written to disk fast enough before the convert happens? MAYBE
-        dbgOpen(picsTaken, "pictures taken.");
-        im.convert(['-delay', '80', '-loop', '0', '*.jpg', 'res.gif'], 
-                function(err, stdout){
-                    if (err) {dbg(err);process.exit();}
-                }
-        );
-        dbgOpen("Gif Generated. Clearing Frames");
-    }, 23000);
 });
 
 socket.on('getOTT', (msg) => {
@@ -83,13 +76,16 @@ socket.on('getOTT', (msg) => {
 });
 
 socket.on('VALIDATE_DELIVERY', () => {
-    clearInterval(takePicsTask)
-
-    // Get all the pics
-    // From count
-    // Look at ../hw_control/image_[1:count].jpg
-
-    // Generate GIF
+    clearInterval(takePicsTask);
+    takePicsTask = null;
+    sleep.sleep(3); // Because sometimes a picture cant be written to disk fast enough before the convert happens? MAYBE
+    dbgOpen(picsTaken, "pictures taken.");
+    im.convert(['-delay', '80', '-loop', '0', '*.jpg', 'res.gif'], // delay = x/100 of a second apparently
+            function(err, stdout){
+                if (err) {dbg(err);process.exit();}
+            }
+    );
+    dbgOpen("Gif Generated.");
 
     // POST GIF
 
