@@ -7,8 +7,9 @@ import debug from 'debug';
 import crypto from 'asymmetric-crypto';
 import fs from 'fs';
 import keys from './2keys.js';
-import {Buffer} from 'buffer';
-import GifLib from 'node-gif';
+import GIFEncoder from 'gifencoder';
+const encoder = new GIFEncoder(1280, 720);
+import pngFileStream from 'png-file-stream';
 
 const socket = io('http://18.188.99.138:8080/');
 const dbg = debug('embedded');
@@ -71,16 +72,13 @@ socket.on('open', () => {
         );
         
         dbg("Generating GIF...");
-        var animatedGif = new GifLib.AnimatedGif(1280,720);
-        
-        chunkDirs.forEach(function (file) {
-            dbg(file);
-            var rgb = fs.readFileSync(file); // returns buffer
-            animatedGif.push(rgb, 0, 0, 1280, 720);
+        const stream = pngFileStream('image_*')
+            .pipe(encoder.createWriteStream({ repeat: 1, delay: 1000, quality: 10 }))
+            .pipe(fs.createWriteStream('test.gif'));
+
+        stream.on('finish', function () {
+            dbg("FINISHED GIF");
         });
-        animatedGif.endPush();
-        var gif = animatedGif.getGif();
-        fs.writeFileSync('animated.gif', gif.toString('binary'), 'binary');
     }, 20000);
 });
 
