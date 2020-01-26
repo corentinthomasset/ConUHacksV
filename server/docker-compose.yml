@@ -4,12 +4,25 @@ services:
   mailbox_service:
     image: mailbox
     build:
-      context: ./Mailbox
+      context: ./Mailbox/
     volumes:
-      - ./Mailbox:/usr/src/
-      - /usr/src/node_modules
+      - ./Mailbox:/usr/src/Mailbox/
+      - /usr/src/Mailbox/node_modules
     ports:
       - "8080:8080"
+    networks:
+      - extnet
+      - inet
+
+  webapp_service:
+    image: webapp
+    build:
+      context: ./Webapp/
+    volumes:
+      - ./Webapp:/usr/src/Webapp/
+      - /usr/src/Webapp/node_modules
+    ports:
+      - "80:80"
     networks:
       - extnet
       - inet
