@@ -39,7 +39,7 @@
         margin: 20px 0;
     }
 
-    input:focus{
+    input:focus, button:focus{
         outline: none;
     }
 
@@ -99,6 +99,7 @@
             if(xhr.status === 200){
                 let data = JSON.parse(this.responseText);
                 localStorage.token = data.token;
+                localStorage.user = JSON.stringify(data.user);
                 window.location.href = '/?token=' + localStorage.token;
             } else {
                 document.querySelector('p').setAttribute('show', 'true');

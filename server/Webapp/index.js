@@ -7,7 +7,6 @@ import Token from './token';
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
 const dbg = Debug('webapp');
 
 const bodyParser = require("body-parser");
@@ -38,8 +37,10 @@ app.all('*', (req, res) => {
     res.redirect("/");
 });
 
-io.on('connection', (socket)=>{
-
+const io = require('socket.io')(http);
+io.sockets.on('connection', Token.authorizeSocket()).on('authenticated', (socket)=> {
+    let userEmail = socket.decoded_token.user;
+    User.registerSocket(userEmail, socket);
 });
 
 http.listen(80, ()=>{

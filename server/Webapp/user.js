@@ -1,6 +1,8 @@
 import http from 'axios';
 import settings from './settings'
 
+let usersSocket = {};
+
 function login(email, password){
     return new Promise((resolve, reject)=>{
         http.get(`${settings.auth_service.api}/user?email=${email}&password=${password}`)
@@ -32,8 +34,14 @@ function jwtLogin(id, token){
     });
 }
 
+function registerSocket(email, socket){
+    usersSocket[email] = socket;
+}
+
+
 export default {
     login: (email, password)=>{return login(email, password)},
     registerToken: (id, token)=>{registerToken(id, token)},
-    jwtLogin: (id, token)=>{return jwtLogin(id, token)}
+    jwtLogin: (id, token)=>{return jwtLogin(id, token)},
+    registerSocket: (email, socket)=>{registerSocket(email, socket)}
 }
