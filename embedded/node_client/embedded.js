@@ -4,6 +4,7 @@
 import {PythonShell} from 'python-shell';
 import io from 'socket.io-client';
 import debug from 'debug';
+import crypto from 'asymmetric-crypto';
 import keys from './2keys.js';
 
 const socket = io('http://18.188.99.138:8080/');
@@ -13,8 +14,8 @@ dbg("----");
 
 socket.on('connect', () => {
     dbg("Connection with C&C Server established.");
-    socket.emit('box_id', keys.publicKey, keys.secretKey)
-    dbg(keys.publicKey);
+    dbg("Pub Key: ", keys.publicKey);
+    socket.emit('box_id', keys.publicKey)
     dbg("Identification sent.");
 });
 
@@ -23,12 +24,12 @@ socket.on('open', () => {
 
     let options = {
         pythonOptions: ['-u'], // get print results in real-time
-        args: ['test']
+        args: ['0']
     };
 
-    var ps = new PythonShell('test.py', options);
+    var ps = new PythonShell('../hw_control/servo.py', options);
     ps.on('message', function (message) {
-        dbg("Output from script:", message);
+        dbg("Output from script: ", message);
     });
 
     ps.end(function (err) {
@@ -36,4 +37,11 @@ socket.on('open', () => {
             throw err;
         };
     });
+});
+
+socket.on('getOTT', (msg) => {
+    dbg('Generating One Time Token!');
+    dbg('OTP Msg: ', msg);
+    const sig = crypto.sign(msg, keys.secretKey);
+    socket.emit('OTT', msg, sig);
 });
