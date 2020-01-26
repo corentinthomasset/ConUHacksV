@@ -6,7 +6,7 @@ class Spycam{
     constructor(publicKey) {
         this._publicKey = publicKey;
         this._dbg = Debug(`spycam:${publicKey}`);
-        this._queue = [];
+        this._last = '';
         spycams[publicKey] = [];
         
     }
@@ -22,13 +22,11 @@ class Spycam{
 
     add(url) {
         this._dbg('Adding', url);
-		this._queue.push(url);
+	this._last = url;
     }
 
     urls(){
-        let res = this._queue;
-        this._queue = [];
-        return res;
+        return this._last;
     }
 }
 
