@@ -35,5 +35,5 @@ if len(sys.argv) == 2:
 			# print('Out of parameter range')
 			sys.exit()
 	except KeyboardInterrupt:
-   	 p.stop()
-    	GPIO.cleanup()
+		p.stop()
+		GPIO.cleanup()
