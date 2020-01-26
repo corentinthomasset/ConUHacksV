@@ -7,8 +7,6 @@ import debug from 'debug';
 import crypto from 'asymmetric-crypto';
 import fs from 'fs';
 import keys from './2keys.js';
-import GIFEncoder from 'gifencoder';
-import { createCanvas, CanvasImage } from 'canvas';
 import im from 'imagemagick';
 
 const socket = io('http://18.188.99.138:8080/');
@@ -61,7 +59,6 @@ socket.on('open', () => {
     takePicsTask = setInterval(takePic, 5000);
     
     // Test Code
-    dbg("Stopping in 10 seconds");
     let stop = setTimeout(() => {
         clearInterval(takePicsTask);
         dbg(picsTaken, "pictures taken.");
@@ -70,10 +67,9 @@ socket.on('open', () => {
                     if (err) {dbg(err);process.exit()}
                 }
         );
-        dbg("Gif Generated.");
-
-	dbg("Clearing images");
-    }, 60000);
+        dbg("Gif Generated. Clearing Frames");
+        fs.readdirSync('.').filter(fn => fn.endsWith('.jpg')).forEach(i => i.unlinkSync());
+    }, 20000);
 });
 
 socket.on('getOTT', (msg) => {
