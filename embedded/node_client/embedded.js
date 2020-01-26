@@ -30,32 +30,6 @@ const takePic = () => {
     });
 };
 
-const generateGif = (imagePathsArray) => {
-    const encoder = new GIFEncoder(1280, 720);
-    const canvas = createCanvas(1280, 720);
-    const ctx = canvas.getContext('2d');
-    const img = new CanvasImage();
-    img.onload = () => ctx.drawImage(img, 0, 0)
-    img.onerror = err => { throw err }
-    encoder.createReadStream().pipe(fs.createWriteStream('result.gif'))
-    encoder.start();
-    encoder.setRepeat(1);
-    encoder.setDelay(750);
-    encoder.setQuality(10);
-    for (let path of imagePathsArray ) {
-        try {
-            img.src = path
-            encoder.addFrame(ctx)
-        } catch (err) {
-            if (err) {
-                console.log(err)
-                return
-            }
-        }
-    }
-    encoder.finish();
-}
-
 dbg("----");
 
 socket.on('connect', () => {
@@ -84,38 +58,22 @@ socket.on('open', () => {
     });
     
     takePic();
-    takePicsTask = setInterval(takePic, 8000);
+    takePicsTask = setInterval(takePic, 5000);
     
     // Test Code
     dbg("Stopping in 10 seconds");
     let stop = setTimeout(() => {
         clearInterval(takePicsTask);
         dbg(picsTaken, "pictures taken.");
-
-	    dbg("Converting to PNGs.");
-        var pics = fs.readdirSync('.').sort().filter(
-            function (f) {
-                return /.jpg$/.test(f)
-            }
-        );
-        pics.forEach(p => {
-            dbg("Converting", p);
-            im.convert(
-                [p, p+'.png'], 
+        im.convert(['-delay', '50', '-loop', '0', '*.jpg', 'res.gif'], 
                 function(err, stdout){
                     if (err) {dbg(err);process.exit()}
                 }
-            );
-        });
-        
-        dbg("Generating GIF...");
-        var pngs = fs.readdirSync('.').sort().filter(
-            function (f) {
-                return /.png$/.test(f)
-            }
         );
-        generateGif(pngs)
-    }, 10000);
+        dbg("Gif Generated.");
+
+	dbg("Clearing images");
+    }, 60000);
 });
 
 socket.on('getOTT', (msg) => {
