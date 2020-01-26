@@ -7,7 +7,7 @@ const dbg = Debug('webapp');
 
 async function auth(req, res, next) {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
+        const token = req.query.token;
         const data = Token.verify(token);
         const user = await User.jwtLogin(data.user, token);
         if (!user) {

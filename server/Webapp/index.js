@@ -11,7 +11,7 @@ const io = require('socket.io')(http);
 const dbg = Debug('webapp');
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 app.post('/login', async (req, res) => {
     try {
@@ -32,6 +32,10 @@ app.post('/login', async (req, res) => {
 app.get('/', Auth, async(req, res) => {
     // View logged in user profile
     res.send('Logged in')
+});
+
+app.all('*', (req, res) => {
+    res.redirect("/");
 });
 
 io.on('connection', (socket)=>{

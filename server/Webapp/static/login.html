@@ -2,13 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+
+    html{
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+    }
+
+    body{
+        height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1{
+        font-weight: 300;
+        text-align: center;
+        margin-bottom: 50px;
+        opacity: .1;
+    }
+
+    input{
+        display: block;
+        border: none;
+        box-shadow: 0 0 20px rgba(113, 0, 255, .1);
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-size: .9em;
+        width: 300px;
+        height: 30px;
+        margin: 20px 0;
+    }
+
+    input:focus{
+        outline: none;
+    }
+
+    p{
+        transition: all 0.2s ease;
+    }
+
+    p:not([show]){
+        opacity: 0;
+    }
+
+    p[show]{
+        margin: 40px 0;
+        text-align: center;
+        font-size: .9em;
+        color: #d32f2f;
+    }
+
+    button{
+        border: none;
+        background: linear-gradient(45deg, #7100ff, #c027ff);
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: .9em;
+        box-shadow: 0 0 20px rgba(113, 0, 255, .3);
+        cursor: pointer;
+        display: block;
+        margin: auto;
+        width: 150px;
+    }
+
+    </style>
 </head>
 <body>
-    <form action="/login" method="post">
-        <input type="email" name="email"/>
-        <input type="password" name="password"/>
-        <button type="submit">Login</button>
-    </form>
+    <div>
+        <h1>Hi!</h1>
+        <input type="email" name="email" placeholder="Email"/>
+        <input type="password" name="password" placeholder="Password"/>
+        <p>Login failed! Check authentication credentials</p>
+        <button onclick="login()">Login</button>
+    </div>
+<script>
+    function login(){
+        let email = document.querySelector('input[type=email]');
+        let password = document.querySelector('input[type=password]');
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", '/login', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            email: email.value,
+            password: password.value
+        }));
+
+        xhr.onload = function() {
+            if(xhr.status === 200){
+                let data = JSON.parse(this.responseText);
+                localStorage.token = data.token;
+                window.location.href = '/?token=' + localStorage.token;
+            } else {
+                document.querySelector('p').setAttribute('show', 'true');
+            }
+        }
+    }
+
+    if(localStorage.token){
+        window.location.href = '/?token=' + localStorage.token;
+    }
+</script>
 </body>
 </html>
