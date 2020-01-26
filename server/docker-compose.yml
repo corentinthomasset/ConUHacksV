@@ -27,6 +27,16 @@ services:
       - extnet
       - inet
 
+  auth_service:
+    image: auth
+    build:
+      context: ./Auth/
+    volumes:
+      - ./Auth:/usr/src/Auth/
+      - /usr/src/Auth/node_modules
+    networks:
+      - inet
+
 networks:
   extnet:
   inet:

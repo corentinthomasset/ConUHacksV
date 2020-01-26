@@ -14,7 +14,6 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.post('/login', async (req, res) => {
-    // Login a registered user
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -22,7 +21,8 @@ app.post('/login', async (req, res) => {
         if (!user) {
             return res.status(401).send({error: 'Login failed! Check authentication credentials'});
         }
-        const token = Token.generateAuthToken(user);
+        const token = Token.generateAuthToken({user: email});
+        User.registerToken(email, token);
         res.send({ user, token })
     } catch (error) {
         res.status(400).send(error);
