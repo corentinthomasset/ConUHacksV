@@ -20,8 +20,8 @@ p = GPIO.PWM(12, 50)
 #print("Choisir une action")
 if len(sys.argv) == 2:
 	choice = sys.argv[1]
-	print choice
-	#print sys.argv
+	# print(choice)
+	# print sys.argv
 	p.start(0)
 
 	try:
@@ -32,10 +32,8 @@ if len(sys.argv) == 2:
 			p.ChangeDutyCycle(2.5)  # turn towards 90 degree
 			time.sleep(1) # sleep 1 second
 		else:
-			print 'Out of parameter range'
+			# print('Out of parameter range')
 			sys.exit()
 	except KeyboardInterrupt:
    	 p.stop()
     	GPIO.cleanup()
-
-
