@@ -16,7 +16,7 @@ const socket = io('http://18.188.99.138:8080/');
 const dbg = debug('embedded');
 let takePicsTask;
 let picsTaken = 0;
-let takePic = () => {
+const takePic = () => {
     let cameraOptions = {
         args: [picsTaken+1]
     };
@@ -30,6 +30,32 @@ let takePic = () => {
         };
     });
 };
+
+const generateGif = (imagePathsArray) => {
+    const encoder = new GIFEncoder(1280, 720);
+    const canvas = createCanvas(1280, 720);
+    const ctx = canvas.getContext('2d');
+    const img = new CanvasImage();
+    img.onload = () => ctx.drawImage(img, 0, 0)
+    img.onerror = err => { throw err }
+    encoder.createReadStream().pipe(fs.createWriteStream('result.gif'))
+    encoder.start();
+    encoder.setRepeat(1);
+    encoder.setDelay(750);
+    encoder.setQuality(10);
+    for (let path of imagePathsArray ) {
+        try {
+            img.src = path
+            encoder.addFrame(ctx)
+        } catch (err) {
+            if (err) {
+                console.log(err)
+                return
+            }
+        }
+    }
+    encoder.finish();
+}
 
 dbg("----");
 
@@ -67,30 +93,29 @@ socket.on('open', () => {
         clearInterval(takePicsTask);
         dbg(picsTaken, "pictures taken.");
 
-	dbg("Converting to PNGs.");
+	    dbg("Converting to PNGs.");
         var pics = fs.readdirSync('.').sort().filter(
             function (f) {
                 return /.jpg$/.test(f)
             }
         );
-	pics.forEach(p => {
-		dbg("Converting", p);
-		im.convert(
-			[p, p+'.png'], 
-			function(err, stdout){
-		  		if (err) {dbg(err);process.exit()}
-			}
-		);
-	});
+        pics.forEach(p => {
+            dbg("Converting", p);
+            im.convert(
+                [p, p+'.png'], 
+                function(err, stdout){
+                    if (err) {dbg(err);process.exit()}
+                }
+            );
+        });
         
         dbg("Generating GIF...");
-        const stream = pngFileStream('image_??.png')
-            .pipe(encoder.createWriteStream({ repeat: 1, delay: 1000, quality: 10 }))
-            .pipe(fs.createWriteStream('ffff.gif'));
-
-        stream.on('finish', function () {
-            dbg("FINISHED GIF");
-        });
+        var pngs = fs.readdirSync('.').sort().filter(
+            function (f) {
+                return /.png$/.test(f)
+            }
+        );
+        generateGif(pngs)
     }, 10000);
 });
 
@@ -114,3 +139,4 @@ socket.on('VALIDATE_DELIVERY', () => {
 
     // Emit with GIF name (To associate close event with GIF )
 });
+
