@@ -13,8 +13,8 @@ dbg("----");
 
 socket.on('connect', () => {
     dbg("Connection with C&C Server established.");
-    socket.emit('box_id', keys.publicKey, keys.secretKey)
-    dbg(keys.publicKey);
+    dbg("Pub Key: ", keys.publicKey);
+    socket.emit('box_id', keys.publicKey)
     dbg("Identification sent.");
 });
 
@@ -36,4 +36,11 @@ socket.on('open', () => {
             throw err;
         };
     });
+});
+
+socket.on('get_OTT', (msg) => {
+    dbg('Generating One Time Token!');
+    dbg('OTP Msg: ', msg);
+    const sig = crypto.sign(msg, keys.secretKey);
+    socket.emit('OPT', msg, sig);
 });
