@@ -19,11 +19,25 @@ class Mailbox{
                 console.log(OTT);
             });
         }, 5000);
+
+        setTimeout(()=>{
+            this.validateDelivery();
+        }, 37000);
     }
 
     open(){
         this._socket.emit('open');
         this._dbg(`Opening box`);
+    }
+
+    validateDelivery(){
+        this._socket.emit('validateDelivery');
+        this._dbg(`Validating Delivery`);
+    }
+
+    singleBuzz(){
+        this._socket.emit('singleBuzz');
+        this._dbg(`Quick Buzzing`);
     }
 
     getToken(id){

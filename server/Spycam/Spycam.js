@@ -14,6 +14,9 @@ class Spycam{
     saveDest(){
         const filesafe = this._publicKey.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         const dir = 'users/'+filesafe+'/';
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
         return dir;
     }
 
