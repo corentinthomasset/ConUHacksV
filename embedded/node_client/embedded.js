@@ -10,6 +10,7 @@ import keys from './2keys.js';
 import GIFEncoder from 'gifencoder';
 const encoder = new GIFEncoder(1280, 720);
 import pngFileStream from 'png-file-stream';
+import im from 'imagemagick';
 
 const socket = io('http://18.188.99.138:8080/');
 const dbg = debug('embedded');
@@ -61,25 +62,36 @@ socket.on('open', () => {
     takePicsTask = setInterval(takePic, 8000);
     
     // Test Code
-    dbg("Stopping in 20 seconds");
+    dbg("Stopping in 10 seconds");
     let stop = setTimeout(() => {
         clearInterval(takePicsTask);
         dbg(picsTaken, "pictures taken.");
-        var chunkDirs = fs.readdirSync('.').sort().filter(
+
+	dbg("Converting to PNGs.");
+        var pics = fs.readdirSync('.').sort().filter(
             function (f) {
-                return /^image_/.test(f)
+                return /.jpg$/.test(f)
             }
         );
+	pics.forEach(p => {
+		dbg("Converting", p);
+		im.convert(
+			[p, p+'.png'], 
+			function(err, stdout){
+		  		if (err) {dbg(err);process.exit()}
+			}
+		);
+	});
         
         dbg("Generating GIF...");
-        const stream = pngFileStream('image_*')
+        const stream = pngFileStream('image_??.png')
             .pipe(encoder.createWriteStream({ repeat: 1, delay: 1000, quality: 10 }))
-            .pipe(fs.createWriteStream('test.gif'));
+            .pipe(fs.createWriteStream('ffff.gif'));
 
         stream.on('finish', function () {
             dbg("FINISHED GIF");
         });
-    }, 20000);
+    }, 10000);
 });
 
 socket.on('getOTT', (msg) => {
