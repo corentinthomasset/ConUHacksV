@@ -13,6 +13,7 @@
     "asymmetric-crypto": "^1.0.2",
     "debug": "^4.1.1",
     "express": "^4.17.1",
+    "node-gif": "^1.0.5",
     "nodemon": "^1.19.3",
     "python-shell": "^1.0.8",
     "socket.io-client": "^2.3.0"
