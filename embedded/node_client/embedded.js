@@ -8,7 +8,7 @@ import crypto from 'asymmetric-crypto';
 import fs from 'fs';
 import keys from './2keys.js';
 import GIFEncoder from 'gifencoder';
-import { createCanvas } from 'canvas';
+import { createCanvas, CanvasImage } from 'canvas';
 import im from 'imagemagick';
 
 const socket = io('http://18.188.99.138:8080/');
