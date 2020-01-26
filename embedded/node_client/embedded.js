@@ -23,12 +23,12 @@ socket.on('open', () => {
 
     let options = {
         pythonOptions: ['-u'], // get print results in real-time
-        args: ['test']
+        args: ['0']
     };
 
-    var ps = new PythonShell('test.py', options);
+    var ps = new PythonShell('../hw_control/servo.py', options);
     ps.on('message', function (message) {
-        dbg("Output from script:", message);
+        dbg("Output from script: ", message);
     });
 
     ps.end(function (err) {
