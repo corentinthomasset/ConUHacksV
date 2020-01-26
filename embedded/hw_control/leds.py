@@ -14,7 +14,7 @@ def setup():
 	# and initial level to High(3.3v)
 	GPIO.setup(LedPins, GPIO.OUT, initial=GPIO.HIGH)
 	
-	time.sleep(3)
+	time.sleep(1)
 
 # Define a main function for main process
 def main():

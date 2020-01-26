@@ -10,19 +10,54 @@ import keys from './2keys.js';
 import im from 'imagemagick';
 import request from 'request';
 
-const socket = io('http://18.188.99.138:8080/');
-const spycamIp = 'https://18.188.99.138:9999/';
+const MAIN_URL = 'http://172.30.191.200';
+
+const socket = io(MAIN_URL+':8080/');
 const dbg = debug('embedded');
 const dbgOpen = debug('embedded:open');
 
-let takePicsTask;
+let takePicsTask = null;
 let picsTaken = 0;
+
+function leds(arg) {
+    let options = {
+        args: [arg]
+    };
+    var ps = new PythonShell('../hw_control/leds.py', options);
+    ps.end(function (err) {
+        if (err){
+            throw err;
+        };
+    });
+}
+
+function door(arg) {
+    let options = {
+        args: [arg]
+    };
+
+    var ps = new PythonShell('../hw_control/servo.py', options);
+    ps.end(function (err) {
+        if (err){
+            throw err;
+        };
+    });
+}
+
+function single_buzz() {
+    var ps = new PythonShell('../hw_control/single_buzz.py');
+    ps.end(function (err) {
+        if (err){
+            throw err;
+        };
+    });
+}
 
 const takePic = () => {
     let cameraOptions = {
         args: [picsTaken+1]
     };
-    dbgOpen("Taking picture", picsTaken+1, " in 3 seconds.");
+    dbgOpen("Taking picture", picsTaken+1, " in 3... 2... 1... SNAP");
     var cameraShell = new PythonShell('../hw_control/camera.py', cameraOptions);
     cameraShell.end(function (err) {
         picsTaken = picsTaken + 1;
@@ -36,9 +71,8 @@ dbg("----");
 
 socket.on('connect', () => {
     dbg("Connection with C&C Server established.");
-    dbg("Pub Key: ", keys.publicKey);
     socket.emit('box_id', keys.publicKey)
-    dbg("Identification sent.");
+    dbg("Pub Key Sent: ", keys.publicKey);
 });
 
 socket.on('open', () => {
@@ -48,38 +82,15 @@ socket.on('open', () => {
     }
     dbg('Open Sesame!');
 
-    let options = {
-        args: ['0']
-    };
-
-    var ps = new PythonShell('../hw_control/servo.py', options);
-    ps.on('message', function (message) {
-        dbg("Output from script: ", message);
-    });
-    ps.end(function (err) {
-        if (err){
-            throw err;
-        };
-    });
-
-    let options = {
-        args: ['1']
-    };
-    var ps2 = new PythonShell('../hw_control/leds.py', options);
-    ps2.on('message', function (message) {
-        dbg("Output from script: ", message);
-    });
-    ps2.end(function (err) {
-        if (err){
-            throw err;
-        };
-    });
+    door(0);
+    leds(1);
 
     // Clean images before starting a new process.
+    picsTaken = 0;
     fs.readdirSync('.').filter(fn => fn.endsWith('.jpg')).forEach(i => fs.unlinkSync(i));
     
     takePic();
-    takePicsTask = setInterval(takePic, 5000);
+    takePicsTask = setInterval(takePic, 6000);
 });
 
 socket.on('getOTT', (msg) => {
@@ -89,52 +100,43 @@ socket.on('getOTT', (msg) => {
     socket.emit('OTT', msg, sig);
 });
 
-
-socket.on('ON_SINGLE_BUZZ', () => {
+socket.on('singleBuzz', () => {
     dbg('Single Buzz Requested!');
-    socket.emit('OTT', msg, sig);
-
-    let options = {
-        pythonOptions: ['-u'], // get print results in real-time
-        args: ['0']
-    };
-
-    var ps = new PythonShell('../hw_control/servo.py', options);
-    ps.on('message', function (message) {
-        dbg("Output from script: ", message);
-    });
-    ps.end(function (err) {
-        if (err){
-            throw err;
-        };
-    });
+    single_buzz();
 });
 
-socket.on('VALIDATE_DELIVERY', () => {
+socket.on('validateDelivery', () => {
+    dbgOpen("Validating Delivery");
     clearInterval(takePicsTask);
     takePicsTask = null;
-    sleep.sleep(3); // Because sometimes a picture cant be written to disk fast enough before the convert happens? MAYBE
+    
+    door(1);
+    single_buzz();
+    sleep.sleep(2); // Because sometimes a picture cant be written to disk fast enough before the convert happens? MAYBE
+    leds(0);
+
     dbgOpen(picsTaken, "pictures taken.");
-    im.convert(['-delay', '80', '-loop', '0', '*.jpg', 'res.gif'], // delay = x/100 of a second apparently
+    im.convert(['-delay', '90', '-loop', '500', '*.jpg', 'res.gif'], // delay = x/100 of a second apparently
             function(err, stdout){
                 if (err) {dbg(err);process.exit();}
-            }
-    );
-    dbgOpen("Gif Generated.");
+		dbgOpen("Gif Generated.");
+    		sleep.sleep(3);
+		dbgOpen("Sending gif...");
+ 		const formData = {
+			spycam: fs.createReadStream('res.gif'),
+		};
     
-    request.post({url:'http://172.30.191.200:9999/upload/'+encodeURIComponent(keys.publicKey), formData: formData}, (err, res, body) => {
-    	if (err) {
-        	dbgOpen("Error on upload", err);
-    	} else {
-	    	dbgOpen('Gif uploaded');
-	}
-    });
-
-
-
-
+    		request.post({url:MAIN_URL+':9999/upload/'+encodeURIComponent(keys.publicKey), formData: formData}, (err, res, body) => {
+    			if (err) {
+        			dbgOpen("Error on upload", err);
+		    	} else {
+			    	dbgOpen('Gif uploaded');
+			}
+    		});
+	    }
+    );
+    
     // POST GIF
-
     // Emit with GIF name (To associate close event with GIF )
 });
 
