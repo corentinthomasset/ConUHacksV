@@ -100,17 +100,22 @@
                 let data = JSON.parse(this.responseText);
                 localStorage.token = data.token;
                 localStorage.user = JSON.stringify(data.user);
-                window.location.href = '/?token=' + localStorage.token;
+                if(window.location.hash){
+                    window.location.href = '/?token=' + localStorage.token + window.location.hash;
+                } else {
+                    window.location.href = '/?token=' + localStorage.token;
+                }
             } else {
-                localStorage.token = '';
                 document.querySelector('p').setAttribute('show', 'true');
             }
         }
     }
-
-    /*if(localStorage.token){
-        window.location.href = '/?token=' + localStorage.token;
-    }*/
+    if(window.location.search.includes('token')){
+        localStorage.clear();
+    }
+    if(window.location.hash && localStorage.token){
+        window.location.href = '/?token=' + localStorage.token + window.location.hash;
+    }
 </script>
 </body>
 </html>
