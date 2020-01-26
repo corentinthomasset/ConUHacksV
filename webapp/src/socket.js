@@ -12,7 +12,6 @@ socket.on('connect',()=>{
         .emit('authenticate', {token: token})
         .on('authenticated', ()=> {
             socket.on('lock', (boxId)=>{
-                console.log('lock!');
                 Box.update({data:{
                         id: boxId,
                         open: false,
@@ -23,7 +22,6 @@ socket.on('connect',()=>{
                     axios.get('http://18.188.99.138:9999/spycam/' + encodeURIComponent(boxId)).then((response) => {
                         let path = response.data[0];
                         let attachment = `http://18.188.99.138:9999/${path}`;
-                        console.log(attachment);
                         Alert.insert({data:{
                                 boxId: boxId,
                                 date: new Date().getTime(),
