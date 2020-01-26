@@ -17,6 +17,7 @@ const dbgOpen = debug('embedded:open');
 
 let takePicsTask;
 let picsTaken = 0;
+
 const takePic = () => {
     let cameraOptions = {
         args: [picsTaken+1]
@@ -48,7 +49,6 @@ socket.on('open', () => {
     dbg('Open Sesame!');
 
     let options = {
-        pythonOptions: ['-u'], // get print results in real-time
         args: ['0']
     };
 
@@ -57,6 +57,19 @@ socket.on('open', () => {
         dbg("Output from script: ", message);
     });
     ps.end(function (err) {
+        if (err){
+            throw err;
+        };
+    });
+
+    let options = {
+        args: ['1']
+    };
+    var ps2 = new PythonShell('../hw_control/leds.py', options);
+    ps2.on('message', function (message) {
+        dbg("Output from script: ", message);
+    });
+    ps2.end(function (err) {
         if (err){
             throw err;
         };
@@ -74,6 +87,27 @@ socket.on('getOTT', (msg) => {
     dbg('OTP Msg: ', msg);
     const sig = crypto.sign(msg, keys.secretKey);
     socket.emit('OTT', msg, sig);
+});
+
+
+socket.on('ON_SINGLE_BUZZ', () => {
+    dbg('Single Buzz Requested!');
+    socket.emit('OTT', msg, sig);
+
+    let options = {
+        pythonOptions: ['-u'], // get print results in real-time
+        args: ['0']
+    };
+
+    var ps = new PythonShell('../hw_control/servo.py', options);
+    ps.on('message', function (message) {
+        dbg("Output from script: ", message);
+    });
+    ps.end(function (err) {
+        if (err){
+            throw err;
+        };
+    });
 });
 
 socket.on('VALIDATE_DELIVERY', () => {
