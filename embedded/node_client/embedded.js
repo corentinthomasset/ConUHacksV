@@ -4,6 +4,7 @@
 import {PythonShell} from 'python-shell';
 import io from 'socket.io-client';
 import debug from 'debug';
+import crypto from 'asymmetric-crypto';
 import keys from './2keys.js';
 
 const socket = io('http://18.188.99.138:8080/');
