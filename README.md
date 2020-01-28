@@ -1,4 +1,4 @@
-# Serenety Smart Mailbox
+# Smart Mailbox
 *How often have you been worried about a delivery? What if we could give you a little serenity? We have decided to use technology to empower the user by developing a smart and secure mailbox.*
 
 In a growing ecommerce marketplace where 1.8 Billion people buy products, we have decided to use technology to empower the user to improve the accountability and integrity of the parcels and mail delivery. Our objective was to help all users involved in the delivery system, starting from the companies that send their products, to the delivery service providers , and finalizing with the consumer.
